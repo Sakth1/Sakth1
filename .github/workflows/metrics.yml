@@ -1,17 +1,21 @@
-name: GitHub Metrics (Dark Theme & Multiple SVGs)
+name: GitHub Metrics (Dark Theme & README update)
 
 on:
   schedule:
-    # Runs once daily at 6:00 AM IST
-    - cron: "30 0 * * *"
+    # Runs once every 2 days at 06:00 IST (00:30 UTC)
+    - cron: "30 0 */2 * *"
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      # 1) Base Profile Summary (dark theme)
+      # --- Your existing metrics generation steps (kept as-is) ---
       - name: Base Profile Summary
         uses: lowlighter/metrics@latest
         with:
@@ -23,7 +27,6 @@ jobs:
           base_indepth: yes
           config_theme: dark
 
-      # 2) Languages Breakdown (dark theme)
       - name: Languages Breakdown
         uses: lowlighter/metrics@latest
         with:
@@ -34,16 +37,12 @@ jobs:
           config_theme: dark
           base: repositories
           plugin_languages: yes
-          # ignore markup/web-design languages to emphasize programming / data
           plugin_languages_ignored: html, css, scss
-          # limit to few dominant languages
           plugin_languages_limit: 10
-          # show details by bytes and % usage
           plugin_languages_details: bytes-size, percentage
           plugin_languages_threshold: 2%
           plugin_languages_colors: github
 
-      # 3) Activity + Calendar (dark theme)
       - name: Recent Activity + Calendar
         uses: lowlighter/metrics@latest
         with:
@@ -54,14 +53,12 @@ jobs:
           config_theme: dark
           base: activity
           plugin_activity: yes
-          # maybe 90-day window rather than 30 — reflects ongoing long-term projects
           plugin_activity_days: 90
           plugin_activity_filter: all
           plugin_activity_visibility: public
           plugin_calendar: yes
           plugin_calendar_limit: 1
 
-      # 4) Code Volume & Lines Changed (dark theme) — optional, but good to show real work
       - name: Lines of Code & Repo Stats
         uses: lowlighter/metrics@latest
         with:
@@ -73,10 +70,8 @@ jobs:
           base: ""
           plugin_lines_sections: repositories
           plugin_lines_repositories_limit: 5
-          # choose to display total lines changed over time (or diff history)
           plugin_lines_history_limit: 3
 
-      # 5) Repositories showcase (pinned / starred / recent) — helps highlight StaTube
       - name: Repositories Showcase
         uses: lowlighter/metrics@latest
         with:
@@ -91,7 +86,6 @@ jobs:
           plugin_repositories_order: pinned, starred, random
           plugin_repositories_affiliations: owner
 
-      # 6) Achievements / Stats overview (dark theme)
       - name: Achievements & Stats
         uses: lowlighter/metrics@latest
         with:
@@ -102,7 +96,117 @@ jobs:
           config_theme: dark
           base: ""
           plugin_achievements: yes
-          # no threshold to show all achievements
           plugin_achievements_threshold: 0
           plugin_achievements_secrets: yes
           plugin_achievements_display: detailed
+
+      # --- Commit the generated SVGs into the repo under /assets/metrics ---
+      - name: Create assets directory
+        run: |
+          mkdir -p assets/metrics
+          ls -la
+
+      - name: Move generated svgs to assets
+        run: |
+          # move any metrics-*.svg files to assets/metrics
+          mv -f metrics-*.svg assets/metrics/  || true
+          ls -la assets/metrics || true
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Commit generated metrics images
+        uses: EndBug/add-and-commit@v9
+        with:
+          author_name: github-actions[bot]
+          author_email: github-actions[bot]@users.noreply.github.com
+          message: "chore(metrics): update generated metrics svgs"
+          add: "assets/metrics/*"
+          push: true
+
+      # --- Update README.md between markers with a visual panel referencing the generated svgs ---
+      - name: Update README (insert metrics panel)
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const path = 'README.md';
+            const startMarker = '<!-- METRICS:START -->';
+            const endMarker = '<!-- METRICS:END -->';
+            const metricsSnippet = `
+<!-- METRICS:START -->
+## 📈 Latest profile snapshot
+
+<div align="center">
+
+<!-- main metrics -->
+<img src="assets/metrics/metrics-base.svg" alt="Base metrics" width="780"/>
+
+<!-- row: languages | activity -->
+<p>
+<img src="assets/metrics/metrics-languages.svg" alt="Languages" width="370" style="margin-right:8px"/>
+<img src="assets/metrics/metrics-activity.svg" alt="Activity" width="370"/>
+</p>
+
+<!-- row: lines | repos | achievements -->
+<p>
+<img src="assets/metrics/metrics-lines.svg" alt="Lines" width="243" style="margin-right:8px"/>
+<img src="assets/metrics/metrics-repos.svg" alt="Repos" width="243" style="margin-right:8px"/>
+<img src="assets/metrics/metrics-achievements.svg" alt="Achievements" width="243"/>
+</p>
+
+</div>
+
+### 🔦 Highlight
+**StaTube** — a desktop YouTube analytics app (active project).  
+- Repo: https://github.com/Sakth1/StaTube  
+- Issues: https://github.com/Sakth1/StaTube/issues
+
+**External contributions**
+- Pull request: https://github.com/spyboy-productions/Valid8Proxy/pull/7
+- External issue reports: https://github.com/YBTopaz8/Dimmer-MAUI/issues?q=is%3Aissue+author%3ASakth1+sort%3Aupdated-desc
+
+**Planned / research**
+- Digital-Harmony (concept/spec): https://github.com/Sakth1/Digital-Harmony
+
+<!-- METRICS:END -->
+`;
+            // read README (or create it if missing)
+            let readme = '';
+            if (fs.existsSync(path)) {
+              readme = fs.readFileSync(path, { encoding: 'utf8' });
+            } else {
+              readme = '# Sakth1\n\n';
+            }
+
+            if (readme.includes(startMarker) && readme.includes(endMarker)) {
+              // replace block
+              const regex = new RegExp(`${startMarker}[\\s\\S]*?${endMarker}`, 'm');
+              readme = readme.replace(regex, metricsSnippet);
+            } else {
+              // append with markers
+              readme += '\n' + metricsSnippet;
+            }
+            fs.writeFileSync(path, readme, { encoding: 'utf8' });
+            // commit change
+            const sha = await github.rest.repos.getContent({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              path: path,
+            }).then(res => res.data.sha).catch(() => null);
+
+            const content = Buffer.from(readme, 'utf8').toString('base64');
+
+            await github.rest.repos.createOrUpdateFileContents({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              path: path,
+              message: 'chore(readme): update metrics panel',
+              content: content,
+              sha: sha || undefined,
+              committer: { name: 'github-actions[bot]', email: 'github-actions[bot]@users.noreply.github.com' },
+              author: { name: 'github-actions[bot]', email: 'github-actions[bot]@users.noreply.github.com' }
+            });
