@@ -1,33 +1,39 @@
-name: GitHub Metrics (Dark Theme & README update)
+name: GitHub Metrics (Dark Theme)
 
 on:
   schedule:
-    # Runs once daily at 6:00 AM IST
+    # Runs daily at 06:00 IST
     - cron: "30 0 * * *"
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
-  build:
+  generate-metrics:
+    name: Generate metrics SVGs
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # --- Your existing metrics generation steps (kept as-is) ---
-      - name: Base Profile Summary
+      # ---------------- Metrics generation ----------------
+
+      - name: Base profile summary
         uses: lowlighter/metrics@latest
         with:
           token: ${{ secrets.METRICS_TOKEN }}
           filename: metrics-base.svg
           config_timezone: Asia/Kolkata
           template: classic
+          config_theme: dark
           base: header, activity, community, repositories
           base_indepth: yes
-          config_theme: dark
 
-      - name: Languages Breakdown
+      - name: Languages breakdown
         uses: lowlighter/metrics@latest
         with:
           token: ${{ secrets.METRICS_TOKEN }}
@@ -43,7 +49,7 @@ jobs:
           plugin_languages_threshold: 2%
           plugin_languages_colors: github
 
-      - name: Recent Activity + Calendar
+      - name: Activity & calendar
         uses: lowlighter/metrics@latest
         with:
           token: ${{ secrets.METRICS_TOKEN }}
@@ -59,7 +65,7 @@ jobs:
           plugin_calendar: yes
           plugin_calendar_limit: 1
 
-      - name: Lines of Code & Repo Stats
+      - name: Lines of code
         uses: lowlighter/metrics@latest
         with:
           token: ${{ secrets.METRICS_TOKEN }}
@@ -72,7 +78,7 @@ jobs:
           plugin_lines_repositories_limit: 5
           plugin_lines_history_limit: 3
 
-      - name: Repositories Showcase
+      - name: Repositories showcase
         uses: lowlighter/metrics@latest
         with:
           token: ${{ secrets.METRICS_TOKEN }}
@@ -82,11 +88,10 @@ jobs:
           config_theme: dark
           base: ""
           plugin_repositories_starred: yes
-          plugin_repositories_random: no
-          plugin_repositories_order: pinned, starred, random
+          plugin_repositories_order: pinned, starred
           plugin_repositories_affiliations: owner
 
-      - name: Achievements & Stats
+      - name: Achievements
         uses: lowlighter/metrics@latest
         with:
           token: ${{ secrets.METRICS_TOKEN }}
@@ -100,113 +105,80 @@ jobs:
           plugin_achievements_secrets: yes
           plugin_achievements_display: detailed
 
-      # --- Commit the generated SVGs into the repo under /assets/metrics ---
-      - name: Create assets directory
+      # ---------------- Commit SVGs ----------------
+
+      - name: Move metrics to assets
         run: |
           mkdir -p assets/metrics
-          ls -la
+          mv -f metrics-*.svg assets/metrics/
 
-      - name: Move generated svgs to assets
-        run: |
-          # move any metrics-*.svg files to assets/metrics
-          mv -f metrics-*.svg assets/metrics/  || true
-          ls -la assets/metrics || true
-
-      - name: Configure git
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-      - name: Commit generated metrics images
+      - name: Commit metrics SVGs
         uses: EndBug/add-and-commit@v9
         with:
-          author_name: github-actions[bot]
-          author_email: github-actions[bot]@users.noreply.github.com
-          message: "chore(metrics): update generated metrics svgs"
+          message: "chore(metrics): update generated SVGs"
           add: "assets/metrics/*"
-          push: true
 
-      # --- Update README.md between markers with a visual panel referencing the generated svgs ---
-      - name: Update README (insert metrics panel)
+  update-readme:
+    name: Update README metrics panel
+    needs: generate-metrics
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Update README.md
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const fs = require('fs');
+
             const path = 'README.md';
-            const startMarker = '<!-- METRICS:START -->';
-            const endMarker = '<!-- METRICS:END -->';
-            const metricsSnippet = `
-<!-- METRICS:START -->
-## 📈 Latest profile snapshot
+            const start = '<!-- METRICS:START -->';
+            const end = '<!-- METRICS:END -->';
 
-<div align="center">
+            const block = [
+              start,
+              '## 📈 Latest profile snapshot',
+              '',
+              '<div align="center">',
+              '',
+              '<img src="assets/metrics/metrics-base.svg" width="780"/>',
+              '',
+              '<p>',
+              '<img src="assets/metrics/metrics-languages.svg" width="370"/>',
+              '<img src="assets/metrics/metrics-activity.svg" width="370"/>',
+              '</p>',
+              '',
+              '<p>',
+              '<img src="assets/metrics/metrics-lines.svg" width="243"/>',
+              '<img src="assets/metrics/metrics-repos.svg" width="243"/>',
+              '<img src="assets/metrics/metrics-achievements.svg" width="243"/>',
+              '</p>',
+              '',
+              '</div>',
+              '',
+              end
+            ].join('\n');
 
-<!-- main metrics -->
-<img src="assets/metrics/metrics-base.svg" alt="Base metrics" width="780"/>
+            let readme = fs.existsSync(path)
+              ? fs.readFileSync(path, 'utf8')
+              : '# Sakth1\n';
 
-<!-- row: languages | activity -->
-<p>
-<img src="assets/metrics/metrics-languages.svg" alt="Languages" width="370" style="margin-right:8px"/>
-<img src="assets/metrics/metrics-activity.svg" alt="Activity" width="370"/>
-</p>
-
-<!-- row: lines | repos | achievements -->
-<p>
-<img src="assets/metrics/metrics-lines.svg" alt="Lines" width="243" style="margin-right:8px"/>
-<img src="assets/metrics/metrics-repos.svg" alt="Repos" width="243" style="margin-right:8px"/>
-<img src="assets/metrics/metrics-achievements.svg" alt="Achievements" width="243"/>
-</p>
-
-</div>
-
-### 🔦 Highlight
-**StaTube** — a desktop YouTube analytics app (active project).  
-- Repo: https://github.com/Sakth1/StaTube  
-- Issues: https://github.com/Sakth1/StaTube/issues
-
-**External contributions**
-- Pull request: https://github.com/spyboy-productions/Valid8Proxy/pull/7
-- External issue reports: https://github.com/YBTopaz8/Dimmer-MAUI/issues?q=is%3Aissue+author%3ASakth1+sort%3Aupdated-desc
-
-**Planned / research**
-- Digital-Harmony (concept/spec): https://github.com/Sakth1/Digital-Harmony
-
-<!-- METRICS:END -->
-`;
-            // read README (or create it if missing)
-            let readme = '';
-            if (fs.existsSync(path)) {
-              readme = fs.readFileSync(path, { encoding: 'utf8' });
+            if (readme.includes(start) && readme.includes(end)) {
+              const regex = new RegExp(`${start}[\\s\\S]*?${end}`, 'm');
+              readme = readme.replace(regex, block);
             } else {
-              readme = '# Sakth1\n\n';
+              readme += '\n\n' + block;
             }
 
-            if (readme.includes(startMarker) && readme.includes(endMarker)) {
-              // replace block
-              const regex = new RegExp(`${startMarker}[\\s\\S]*?${endMarker}`, 'm');
-              readme = readme.replace(regex, metricsSnippet);
-            } else {
-              // append with markers
-              readme += '\n' + metricsSnippet;
-            }
-            fs.writeFileSync(path, readme, { encoding: 'utf8' });
-            // commit change
-            const sha = await github.rest.repos.getContent({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              path: path,
-            }).then(res => res.data.sha).catch(() => null);
+            fs.writeFileSync(path, readme);
 
-            const content = Buffer.from(readme, 'utf8').toString('base64');
-
-            await github.rest.repos.createOrUpdateFileContents({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              path: path,
-              message: 'chore(readme): update metrics panel',
-              content: content,
-              sha: sha || undefined,
-              committer: { name: 'github-actions[bot]', email: 'github-actions[bot]@users.noreply.github.com' },
-              author: { name: 'github-actions[bot]', email: 'github-actions[bot]@users.noreply.github.com' }
-            });
+      - name: Commit README update
+        uses: EndBug/add-and-commit@v9
+        with:
+          message: "chore(readme): update metrics panel"
+          add: "README.md"
