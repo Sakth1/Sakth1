@@ -2,9 +2,9 @@ name: GitHub Metrics
 
 on:
   workflow_dispatch:
-  # (optional later)
+  # Optional automatic run
   # schedule:
-  #   - cron: "30 0 * * *" # 06:00 IST daily
+  #   - cron: "30 0 * * *"   # 06:00 IST daily
 
 permissions:
   contents: write
@@ -145,21 +145,18 @@ jobs:
           mkdir -p assets/metrics
           mv -f metrics-*.svg assets/metrics/
 
-      # ---------------- Skip empty commit ----------------
-      - name: Skip commit if no changes
+      # ---------------- Commit & push (RAW GIT, NO MERGE) ----------------
+      - name: Commit metrics & README
         run: |
-          if git diff --quiet; then
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add assets/metrics/* README.md
+
+          if git diff --cached --quiet; then
             echo "No changes to commit"
             exit 0
           fi
 
-      # ---------------- Commit & push (SAFE) ----------------
-      - name: Commit metrics & README
-        uses: EndBug/add-and-commit@v9
-        with:
-          message: "chore(metrics): update profile metrics"
-          add: |
-            assets/metrics/*
-            README.md
-          pull: false
-          push: true
+          git commit -m "chore(metrics): update profile metrics"
+          git push
