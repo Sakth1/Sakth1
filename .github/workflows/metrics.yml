@@ -2,7 +2,6 @@ name: GitHub Metrics
 
 on:
   workflow_dispatch:
-  # Optional automatic run (IST)
   # schedule:
   #   - cron: "30 0 * * *"   # 06:00 IST daily
 
@@ -20,8 +19,7 @@ jobs:
 
     steps:
       # ---------------- Checkout ----------------
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -31,44 +29,41 @@ jobs:
         with:
           token: ${{ secrets.METRICS_TOKEN }}
           filename: metrics-base.svg
-          config_timezone: Asia/Kolkata
           template: classic
           config_theme: dark
-          base: header, activity, community, repositories
+          config_timezone: Asia/Kolkata
+          base: header, community, repositories
           base_indepth: yes
 
-      # ---------------- Languages ----------------
+      # ---------------- Languages (PUBLIC ONLY) ----------------
       - name: Languages breakdown
         uses: lowlighter/metrics@latest
         with:
           token: ${{ secrets.METRICS_TOKEN }}
           filename: metrics-languages.svg
-          config_timezone: Asia/Kolkata
           template: classic
           config_theme: dark
-          base: repositories
+          base: ""
           plugin_languages: yes
-          plugin_languages_ignored: html, css, scss
+          plugin_languages_public: yes
           plugin_languages_limit: 10
           plugin_languages_details: bytes-size, percentage
           plugin_languages_threshold: 2%
           plugin_languages_colors: github
 
-      # ---------------- Activity & calendar ----------------
-      - name: Activity & calendar
+      # ---------------- Recent activity ----------------
+      - name: Recent activity
         uses: lowlighter/metrics@latest
         with:
           token: ${{ secrets.METRICS_TOKEN }}
           filename: metrics-activity.svg
-          config_timezone: Asia/Kolkata
           template: classic
           config_theme: dark
-          base: activity
+          base: ""
           plugin_activity: yes
           plugin_activity_days: 90
           plugin_activity_filter: all
-          plugin_calendar: yes
-          plugin_calendar_limit: 1
+          plugin_activity_visibility: public
 
       # ---------------- Lines of code ----------------
       - name: Lines of code
@@ -76,7 +71,6 @@ jobs:
         with:
           token: ${{ secrets.METRICS_TOKEN }}
           filename: metrics-lines.svg
-          config_timezone: Asia/Kolkata
           template: classic
           config_theme: dark
           base: ""
@@ -90,7 +84,6 @@ jobs:
         with:
           token: ${{ secrets.METRICS_TOKEN }}
           filename: metrics-repos.svg
-          config_timezone: Asia/Kolkata
           template: classic
           config_theme: dark
           base: ""
@@ -104,7 +97,6 @@ jobs:
         with:
           token: ${{ secrets.METRICS_TOKEN }}
           filename: metrics-milestones.svg
-          config_timezone: Asia/Kolkata
           template: classic
           config_theme: dark
           base: ""
@@ -118,7 +110,6 @@ jobs:
         with:
           token: ${{ secrets.METRICS_TOKEN }}
           filename: metrics-contributions.svg
-          config_timezone: Asia/Kolkata
           template: classic
           config_theme: dark
           base: ""
@@ -127,12 +118,11 @@ jobs:
           plugin_contributors_sections: commits, issues, pulls
 
       # ---------------- Isometric calendar ----------------
-      - name: Isometric contribution calendar
+      - name: Isometric calendar
         uses: lowlighter/metrics@latest
         with:
           token: ${{ secrets.METRICS_TOKEN }}
           filename: metrics-isometric.svg
-          config_timezone: Asia/Kolkata
           template: classic
           config_theme: dark
           base: ""
@@ -142,10 +132,11 @@ jobs:
       # ---------------- Organize assets ----------------
       - name: Move metrics to assets
         run: |
+          rm -f assets/metrics/metrics-achievements.svg || true
           mkdir -p assets/metrics
           mv -f metrics-*.svg assets/metrics/
 
-      # ---------------- Commit & push (FINAL, CORRECT) ----------------
+      # ---------------- Commit & push ----------------
       - name: Commit & push metrics
         run: |
           git config user.name "github-actions[bot]"
@@ -159,8 +150,5 @@ jobs:
           fi
 
           git commit -m "chore(metrics): update profile metrics"
-
-          # Refresh remote state so --force-with-lease is valid
           git fetch origin main
-
           git push --force-with-lease
