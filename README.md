@@ -8,3 +8,26 @@
 
 ### 🏆 Achievements
 ![Achievements](./metrics-achievements.svg)
+
+
+<!-- METRICS:START -->
+## 📈 Latest profile snapshot
+
+<div align="center">
+
+<img src="assets/metrics/metrics-base.svg" width="780"/>
+
+<p>
+<img src="assets/metrics/metrics-languages.svg" width="370"/>
+<img src="assets/metrics/metrics-activity.svg" width="370"/>
+</p>
+
+<p>
+<img src="assets/metrics/metrics-lines.svg" width="243"/>
+<img src="assets/metrics/metrics-repos.svg" width="243"/>
+<img src="assets/metrics/metrics-achievements.svg" width="243"/>
+</p>
+
+</div>
+
+<!-- METRICS:END -->
