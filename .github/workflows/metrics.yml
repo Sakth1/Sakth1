@@ -22,14 +22,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      # ---------------- Sync FIRST (CRITICAL) ----------------
-      - name: Rebase on latest main
+      # ---------------- Initial sync ----------------
+      - name: Sync with latest main
         run: |
           git fetch origin main
           git rebase origin/main
 
       # ---------------- Metrics generation ----------------
-
       - name: Base profile summary
         uses: lowlighter/metrics@latest
         with:
@@ -168,7 +167,7 @@ jobs:
 
             fs.writeFileSync(path, readme);
 
-      # ---------------- Commit & push ----------------
+      # ---------------- Commit & push (FINAL FIX) ----------------
       - name: Commit metrics & README
         uses: EndBug/add-and-commit@v9
         with:
@@ -176,3 +175,4 @@ jobs:
           add: |
             assets/metrics/*
             README.md
+          pull: '--rebase --autostash'
