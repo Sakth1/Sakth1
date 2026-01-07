@@ -167,15 +167,15 @@ jobs:
 
             fs.writeFileSync(path, readme);
 
-      # ---------------- CRITICAL FIX ----------------
-      # Ensure branch is up to date before commit
+      # ---------------- Critical fix ----------------
+      # Ensure local branch is not behind remote
 
       - name: Rebase on latest main
         run: |
           git fetch origin main
           git rebase origin/main
 
-      # ---------------- Atomic commit ----------------
+      # ---------------- Commit & push ----------------
 
       - name: Commit metrics & README
         uses: EndBug/add-and-commit@v9
