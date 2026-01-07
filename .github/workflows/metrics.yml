@@ -22,13 +22,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      # ---------------- Initial sync ----------------
+      # ---------------- Sync ----------------
       - name: Sync with latest main
         run: |
           git fetch origin main
           git rebase origin/main
 
-      # ---------------- Metrics generation ----------------
+      # ---------------- Base profile ----------------
       - name: Base profile summary
         uses: lowlighter/metrics@latest
         with:
@@ -40,6 +40,7 @@ jobs:
           base: header, activity, community, repositories
           base_indepth: yes
 
+      # ---------------- Languages ----------------
       - name: Languages breakdown
         uses: lowlighter/metrics@latest
         with:
@@ -56,6 +57,7 @@ jobs:
           plugin_languages_threshold: 2%
           plugin_languages_colors: github
 
+      # ---------------- Activity & calendar ----------------
       - name: Activity & calendar
         uses: lowlighter/metrics@latest
         with:
@@ -68,10 +70,10 @@ jobs:
           plugin_activity: yes
           plugin_activity_days: 90
           plugin_activity_filter: all
-          plugin_activity_visibility: public
           plugin_calendar: yes
           plugin_calendar_limit: 1
 
+      # ---------------- Lines of code ----------------
       - name: Lines of code
         uses: lowlighter/metrics@latest
         with:
@@ -85,6 +87,7 @@ jobs:
           plugin_lines_repositories_limit: 5
           plugin_lines_history_limit: 3
 
+      # ---------------- Repositories ----------------
       - name: Repositories showcase
         uses: lowlighter/metrics@latest
         with:
@@ -98,19 +101,46 @@ jobs:
           plugin_repositories_order: pinned, starred
           plugin_repositories_affiliations: owner
 
-      - name: Achievements
+      # ---------------- Milestones ----------------
+      - name: Milestones
         uses: lowlighter/metrics@latest
         with:
           token: ${{ secrets.METRICS_TOKEN }}
-          filename: metrics-achievements.svg
+          filename: metrics-milestones.svg
           config_timezone: Asia/Kolkata
           template: classic
           config_theme: dark
           base: ""
-          plugin_achievements: yes
-          plugin_achievements_threshold: 0
-          plugin_achievements_secrets: yes
-          plugin_achievements_display: detailed
+          plugin_milestones: yes
+          plugin_milestones_threshold: 75%
+          plugin_milestones_limit: 6
+
+      # ---------------- Contributions stats ----------------
+      - name: Contributions
+        uses: lowlighter/metrics@latest
+        with:
+          token: ${{ secrets.METRICS_TOKEN }}
+          filename: metrics-contributions.svg
+          config_timezone: Asia/Kolkata
+          template: classic
+          config_theme: dark
+          base: ""
+          plugin_contributors: yes
+          plugin_contributors_contributions: yes
+          plugin_contributors_sections: commits, issues, pulls
+
+      # ---------------- Isometric calendar ----------------
+      - name: Isometric contribution calendar
+        uses: lowlighter/metrics@latest
+        with:
+          token: ${{ secrets.METRICS_TOKEN }}
+          filename: metrics-isometric.svg
+          config_timezone: Asia/Kolkata
+          template: classic
+          config_theme: dark
+          base: ""
+          plugin_isocalendar: yes
+          plugin_isocalendar_duration: full-year
 
       # ---------------- Organize assets ----------------
       - name: Move metrics to assets
@@ -146,7 +176,12 @@ jobs:
               '<p>',
               '<img src="assets/metrics/metrics-lines.svg" width="243"/>',
               '<img src="assets/metrics/metrics-repos.svg" width="243"/>',
-              '<img src="assets/metrics/metrics-achievements.svg" width="243"/>',
+              '<img src="assets/metrics/metrics-milestones.svg" width="243"/>',
+              '</p>',
+              '',
+              '<p>',
+              '<img src="assets/metrics/metrics-contributions.svg" width="370"/>',
+              '<img src="assets/metrics/metrics-isometric.svg" width="370"/>',
               '</p>',
               '',
               '</div>',
@@ -167,7 +202,7 @@ jobs:
 
             fs.writeFileSync(path, readme);
 
-      # ---------------- Commit & push (FINAL FIX) ----------------
+      # ---------------- Commit & push ----------------
       - name: Commit metrics & README
         uses: EndBug/add-and-commit@v9
         with:
