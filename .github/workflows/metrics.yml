@@ -9,12 +9,17 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: metrics-update
+  cancel-in-progress: true
+
 jobs:
-  generate-metrics:
-    name: Generate metrics SVGs
+  metrics-and-readme:
+    name: Generate metrics & update README
     runs-on: ubuntu-latest
 
     steps:
+      # ---------------- Checkout ----------------
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
@@ -105,31 +110,16 @@ jobs:
           plugin_achievements_secrets: yes
           plugin_achievements_display: detailed
 
-      # ---------------- Commit SVGs ----------------
+      # ---------------- Organize assets ----------------
 
       - name: Move metrics to assets
         run: |
           mkdir -p assets/metrics
           mv -f metrics-*.svg assets/metrics/
 
-      - name: Commit metrics SVGs
-        uses: EndBug/add-and-commit@v9
-        with:
-          message: "chore(metrics): update generated SVGs"
-          add: "assets/metrics/*"
+      # ---------------- Update README ----------------
 
-  update-readme:
-    name: Update README metrics panel
-    needs: generate-metrics
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Update README.md
+      - name: Update README metrics panel
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -177,8 +167,12 @@ jobs:
 
             fs.writeFileSync(path, readme);
 
-      - name: Commit README update
+      # ---------------- Single atomic commit ----------------
+
+      - name: Commit metrics & README
         uses: EndBug/add-and-commit@v9
         with:
-          message: "chore(readme): update metrics panel"
-          add: "README.md"
+          message: "chore(metrics): update profile metrics"
+          add: |
+            assets/metrics/*
+            README.md
