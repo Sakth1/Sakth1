@@ -176,3 +176,4 @@ jobs:
           add: |
             assets/metrics/*
             README.md
+          pull: '--rebase --autostash'
