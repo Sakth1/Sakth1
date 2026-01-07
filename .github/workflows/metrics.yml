@@ -145,7 +145,7 @@ jobs:
           mkdir -p assets/metrics
           mv -f metrics-*.svg assets/metrics/
 
-      # ---------------- Commit & push (FINAL, SAFE) ----------------
+      # ---------------- Commit & push (FINAL, CORRECT) ----------------
       - name: Commit & push metrics
         run: |
           git config user.name "github-actions[bot]"
@@ -159,4 +159,8 @@ jobs:
           fi
 
           git commit -m "chore(metrics): update profile metrics"
+
+          # Refresh remote state so --force-with-lease is valid
+          git fetch origin main
+
           git push --force-with-lease
