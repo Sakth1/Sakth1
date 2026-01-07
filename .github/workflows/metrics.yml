@@ -22,11 +22,14 @@ jobs:
         with:
           fetch-depth: 0
 
-      # ---------------- Sync ----------------
-      - name: Sync with latest main
-        run: |
-          git fetch origin main
-          git rebase origin/main
+      - name: Commit metrics & README
+        uses: EndBug/add-and-commit@v9
+        with:
+          message: "chore(metrics): update profile metrics"
+          add: |
+            assets/metrics/*
+            README.md
+          pull: '--rebase --autostash'
 
       # ---------------- Base profile ----------------
       - name: Base profile summary
