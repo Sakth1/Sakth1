@@ -24,7 +24,7 @@ jobs:
           fetch-depth: 0
 
       # ---------------- Base profile ----------------
-      - name: Base profile summary
+      - name: 📊 Base profile summary
         uses: lowlighter/metrics@latest
         with:
           token: ${{ secrets.METRICS_TOKEN }}
@@ -38,7 +38,7 @@ jobs:
           base_indepth: yes
 
       # ---------------- Languages (PUBLIC ONLY, NO FORKS) ----------------
-      - name: Languages breakdown
+      - name: 📚 Most used languages
         uses: lowlighter/metrics@latest
         with:
           token: ${{ secrets.METRICS_TOKEN }}
@@ -52,7 +52,7 @@ jobs:
           repositories_forks: no
           repositories_affiliations: owner
           plugin_languages: yes
-          plugin_languages_limit: 10
+          plugin_languages_limit: 8
           plugin_languages_details: bytes-size, percentage
           plugin_languages_threshold: 1%
           plugin_languages_colors: github
@@ -60,8 +60,8 @@ jobs:
           plugin_languages_indepth: yes
           plugin_languages_analysis_timeout: 30
 
-      # ---------------- Recent activity ----------------
-      - name: Recent activity
+      # ---------------- Recent activity (FIXED) ----------------
+      - name: 🎯 Recent activity
         uses: lowlighter/metrics@latest
         with:
           token: ${{ secrets.METRICS_TOKEN }}
@@ -73,14 +73,13 @@ jobs:
           config_output: svg
           base: ""
           plugin_activity: yes
-          plugin_activity_days: 90
-          plugin_activity_filter: all
-          plugin_activity_visibility: public
           plugin_activity_limit: 5
-          repositories_affiliations: owner
+          plugin_activity_days: 0
+          plugin_activity_filter: all
+          plugin_activity_visibility: all
 
       # ---------------- Lines of code ----------------
-      - name: Lines of code changed
+      - name: 📈 Lines of code changed
         uses: lowlighter/metrics@latest
         with:
           token: ${{ secrets.METRICS_TOKEN }}
@@ -94,29 +93,12 @@ jobs:
           repositories_forks: no
           plugin_lines: yes
           plugin_lines_sections: repositories, history
-          plugin_lines_repositories_limit: 6
+          plugin_lines_repositories_limit: 4
           plugin_lines_history_limit: 2
+          plugin_lines_delay: 5
 
-      # ---------------- Featured repositories ----------------
-      - name: Featured repositories
-        uses: lowlighter/metrics@latest
-        with:
-          token: ${{ secrets.METRICS_TOKEN }}
-          filename: metrics-repos.svg
-          template: classic
-          config_timezone: Asia/Kolkata
-          config_display: large
-          config_animations: yes
-          config_output: svg
-          base: ""
-          plugin_repositories: yes
-          plugin_repositories_featured: ""
-          plugin_repositories_pinned: 6
-          plugin_repositories_order: featured, pinned, starred, random
-          plugin_repositories_affiliations: owner
-
-      # ---------------- Isometric calendar ----------------
-      - name: Isometric commit calendar
+      # ---------------- Isometric calendar (3D-style) ----------------
+      - name: 📅 Isometric commit calendar (3D view)
         uses: lowlighter/metrics@latest
         with:
           token: ${{ secrets.METRICS_TOKEN }}
@@ -131,7 +113,7 @@ jobs:
           plugin_isocalendar_duration: full-year
 
       # ---------------- Achievements ----------------
-      - name: Achievements
+      - name: 🏆 Achievements
         uses: lowlighter/metrics@latest
         with:
           token: ${{ secrets.METRICS_TOKEN }}
@@ -143,12 +125,12 @@ jobs:
           config_output: svg
           base: ""
           plugin_achievements: yes
-          plugin_achievements_display: compact
+          plugin_achievements_display: detailed
           plugin_achievements_secrets: yes
-          plugin_achievements_threshold: B
+          plugin_achievements_threshold: C
 
       # ---------------- Notable contributions ----------------
-      - name: Notable contributions
+      - name: 💫 Notable contributions
         uses: lowlighter/metrics@latest
         with:
           token: ${{ secrets.METRICS_TOKEN }}
@@ -164,30 +146,133 @@ jobs:
           plugin_notable_types: commit, issue, pull_request
           plugin_notable_repositories: yes
 
+      # ---------------- Habits & Coding patterns ----------------
+      - name: 💡 Coding habits
+        uses: lowlighter/metrics@latest
+        with:
+          token: ${{ secrets.METRICS_TOKEN }}
+          filename: metrics-habits.svg
+          template: classic
+          config_timezone: Asia/Kolkata
+          config_display: large
+          config_animations: yes
+          config_output: svg
+          base: ""
+          plugin_habits: yes
+          plugin_habits_from: 200
+          plugin_habits_days: 14
+          plugin_habits_facts: yes
+          plugin_habits_charts: yes
+          plugin_habits_charts_type: classic
+          plugin_habits_trim: yes
+
+      # ---------------- Stars ----------------
+      - name: ⭐ Recently starred
+        uses: lowlighter/metrics@latest
+        with:
+          token: ${{ secrets.METRICS_TOKEN }}
+          filename: metrics-stars.svg
+          template: classic
+          config_timezone: Asia/Kolkata
+          config_display: large
+          config_animations: yes
+          config_output: svg
+          base: ""
+          plugin_stars: yes
+          plugin_stars_limit: 3
+
+      # ---------------- Stargazers ----------------
+      - name: 🌟 Stargazers chart
+        uses: lowlighter/metrics@latest
+        with:
+          token: ${{ secrets.METRICS_TOKEN }}
+          filename: metrics-stargazers.svg
+          template: classic
+          config_timezone: Asia/Kolkata
+          config_display: large
+          config_animations: yes
+          config_output: svg
+          base: ""
+          repositories_forks: no
+          plugin_stargazers: yes
+          plugin_stargazers_charts: yes
+          plugin_stargazers_charts_type: classic
+
       # ---------------- Organize assets ----------------
-      - name: Move metrics to assets
+      - name: 📦 Move metrics to assets
         run: |
           mkdir -p assets/metrics
-          mv -f metrics-*.svg assets/metrics/ || true
+          mv -f metrics-*.svg assets/metrics/ 2>/dev/null || true
 
-      # ---------------- Commit & push ----------------
-      - name: Commit & push metrics
+      # ---------------- Commit & push with conflict resolution ----------------
+      - name: 🚀 Commit & push metrics
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Stage all changes in assets/metrics
-          git add assets/metrics/*.svg
+          # Stage all metrics
+          git add assets/metrics/*.svg 2>/dev/null || true
 
-          # Check if there are changes to commit
+          # Check if there are changes
           if git diff --cached --quiet; then
-            echo "✓ No changes to commit"
+            echo "✅ No changes to commit - metrics are up to date!"
             exit 0
           fi
 
-          # Commit the changes
-          git commit -m "chore(metrics): update profile metrics [skip ci]"
-          
-          # Pull latest changes and push
-          git fetch origin main
-          git push --force-with-lease origin HEAD:main
+          # Show what changed
+          echo "📊 Changes detected in metrics:"
+          git diff --cached --stat
+
+          # Commit changes
+          git commit -m "chore(metrics): update profile metrics [skip ci]
+
+          Updated at $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+
+          # Try to push with retry logic and conflict resolution
+          MAX_RETRIES=3
+          RETRY_COUNT=0
+
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+            echo "🔄 Attempting to push (attempt $((RETRY_COUNT + 1))/$MAX_RETRIES)..."
+            
+            if git push origin HEAD:main; then
+              echo "✅ Successfully pushed metrics!"
+              exit 0
+            fi
+
+            RETRY_COUNT=$((RETRY_COUNT + 1))
+            
+            if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+              echo "⚠️  Push failed, fetching latest changes..."
+              
+              # Fetch latest
+              git fetch origin main
+              
+              # Try to rebase, accepting our changes for SVG files
+              git rebase -X ours origin/main || {
+                echo "🔧 Rebase conflict detected, resolving automatically..."
+                
+                # Accept our version of all SVG files
+                git checkout --ours assets/metrics/*.svg
+                git add assets/metrics/*.svg
+                
+                # Continue rebase
+                git rebase --continue || {
+                  echo "⚠️  Rebase still failing, aborting and using force push..."
+                  git rebase --abort
+                  
+                  # Use force-with-lease as last resort
+                  if git push --force-with-lease origin HEAD:main; then
+                    echo "✅ Force pushed successfully!"
+                    exit 0
+                  fi
+                }
+              }
+              
+              echo "⏳ Waiting 5 seconds before retry..."
+              sleep 5
+            fi
+          done
+
+          echo "❌ Failed to push after $MAX_RETRIES attempts"
+          exit 1
