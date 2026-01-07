@@ -167,7 +167,15 @@ jobs:
 
             fs.writeFileSync(path, readme);
 
-      # ---------------- Single atomic commit ----------------
+      # ---------------- CRITICAL FIX ----------------
+      # Ensure branch is up to date before commit
+
+      - name: Rebase on latest main
+        run: |
+          git fetch origin main
+          git rebase origin/main
+
+      # ---------------- Atomic commit ----------------
 
       - name: Commit metrics & README
         uses: EndBug/add-and-commit@v9
@@ -176,4 +184,3 @@ jobs:
           add: |
             assets/metrics/*
             README.md
-          pull: '--rebase --autostash'
