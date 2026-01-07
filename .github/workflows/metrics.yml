@@ -2,7 +2,7 @@ name: GitHub Metrics
 
 on:
   workflow_dispatch:
-  # Optional automatic run
+  # Optional automatic run (IST)
   # schedule:
   #   - cron: "30 0 * * *"   # 06:00 IST daily
 
@@ -14,8 +14,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  metrics-and-readme:
-    name: Generate metrics & update README
+  metrics:
+    name: Generate & publish profile metrics
     runs-on: ubuntu-latest
 
     steps:
@@ -145,8 +145,8 @@ jobs:
           mkdir -p assets/metrics
           mv -f metrics-*.svg assets/metrics/
 
-      # ---------------- Commit & push (RAW GIT, NO MERGE) ----------------
-      - name: Commit metrics & README
+      # ---------------- Commit & push (FINAL, SAFE) ----------------
+      - name: Commit & push metrics
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -159,4 +159,4 @@ jobs:
           fi
 
           git commit -m "chore(metrics): update profile metrics"
-          git push
+          git push --force-with-lease
