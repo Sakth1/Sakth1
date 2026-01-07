@@ -176,13 +176,18 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
+          # Stage all changes in assets/metrics
           git add assets/metrics/*.svg
 
+          # Check if there are changes to commit
           if git diff --cached --quiet; then
             echo "✓ No changes to commit"
             exit 0
           fi
 
+          # Commit the changes
           git commit -m "chore(metrics): update profile metrics [skip ci]"
-          git pull --rebase origin main
-          git push origin main
+          
+          # Pull latest changes and push
+          git fetch origin main
+          git push --force-with-lease origin HEAD:main
