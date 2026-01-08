@@ -1,7 +1,7 @@
 <div align="center">
 
-<!-- Neon Header -->
-<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=12,18,20,24&height=200&section=header&text=Have a good day!&fontSize=80&fontColor=fff&animation=twinkling&fontAlignY=35&desc=%20Open%20Source%20Contributor&descAlignY=55&descSize=18" />
+<!-- Neon Header - Fixed URL encoding -->
+<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=12,18,20,24&height=200&section=header&text=Have%20a%20good%20day!&fontSize=80&fontColor=fff&animation=twinkling&fontAlignY=35&desc=Open%20Source%20Contributor&descAlignY=55&descSize=18" />
 
 <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=22&duration=2000&pause=1000&color=00F5FF&center=true&vCenter=true&random=false&width=600&lines=%3E+Building+the+future...;%3E+One+commit+at+a+time+%F0%9F%9A%80;%3E+Always+learning+%F0%9F%92%BB;%3E+Code+%7C+Create+%7C+Innovate" alt="Typing SVG" />
 
@@ -40,8 +40,8 @@
   
 <table>
   <tr>
-    <td><img src="./metrics-base.svg" alt="Base Metrics"></td>
-    <td><img src="./metrics-languages.svg" alt="Languages"></td>
+    <td><img src="./assets/metrics/metrics-base.svg" alt="Base Metrics"></td>
+    <td><img src="./assets/metrics/metrics-languages.svg" alt="Languages"></td>
   </tr>
 </table>
 
@@ -58,7 +58,7 @@
 ## 🎯 `[RECENT_ACTIVITY]`
 
 <div align="center">
-<img src="./metrics-activity.svg" alt="Activity" width="95%">
+<img src="./assets/metrics/metrics-activity.svg" alt="Activity" width="95%">
 </div>
 
 <br>
@@ -72,7 +72,7 @@
 ## 🏆 `[ACHIEVEMENTS]`
 
 <div align="center">
-<img src="./metrics-achievements.svg" alt="Achievements" width="95%">
+<img src="./assets/metrics/metrics-achievements.svg" alt="Achievements" width="95%">
 </div>
 
 <br>
@@ -86,7 +86,7 @@
 ## 📅 `[CONTRIBUTION_MATRIX]`
 
 <div align="center">
-<img src="./metrics-isometric.svg" alt="3D Calendar" width="95%">
+<img src="./assets/metrics/metrics-isometric.svg" alt="3D Calendar" width="95%">
 </div>
 
 <br>
@@ -100,7 +100,7 @@
 ## 💡 `[CODING_PATTERNS]`
 
 <div align="center">
-<img src="./metrics-habits.svg" alt="Coding Habits" width="95%">
+<img src="./assets/metrics/metrics-habits.svg" alt="Coding Habits" width="95%">
 </div>
 
 <br>
@@ -117,8 +117,8 @@
 
 <table>
   <tr>
-    <td width="50%"><img src="./metrics-stars.svg" alt="Stars"></td>
-    <td width="50%"><img src="./metrics-stargazers.svg" alt="Stargazers"></td>
+    <td width="50%"><img src="./assets/metrics/metrics-stars.svg" alt="Stars"></td>
+    <td width="50%"><img src="./assets/metrics/metrics-stargazers.svg" alt="Stargazers"></td>
   </tr>
 </table>
 
