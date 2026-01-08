@@ -22,6 +22,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       # ---------------- Base profile ----------------
       - name: 📊 Base profile summary
@@ -172,16 +173,26 @@ jobs:
           echo "✅ Metrics moved to assets/metrics/"
           ls -la assets/metrics/
 
-      # ---------------- Commit & push with conflict resolution ----------------
+      # ---------------- IMPROVED: Commit & push with proper conflict resolution ----------------
       - name: 🚀 Commit & push metrics
         run: |
+          set -e
+          
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Stage all metrics
+          # Clean any unstaged changes first
+          echo "🧹 Cleaning workspace..."
+          git stash --include-untracked || true
+          
+          # Make sure we're on main and up to date
+          git checkout main
+          git fetch origin main
+          
+          # Stage only the metrics files
           git add assets/metrics/*.svg 2>/dev/null || true
 
-          # Check if there are changes
+          # Check if there are changes to commit
           if git diff --cached --quiet; then
             echo "✅ No changes to commit - metrics are up to date!"
             exit 0
@@ -196,51 +207,63 @@ jobs:
 
           Updated at $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
 
-          # Try to push with retry logic and conflict resolution
-          MAX_RETRIES=3
+          # Try to push with retry logic
+          MAX_RETRIES=5
           RETRY_COUNT=0
 
           while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
             echo "🔄 Attempting to push (attempt $((RETRY_COUNT + 1))/$MAX_RETRIES)..."
             
-            if git push origin HEAD:main; then
-              echo "✅ Successfully pushed metrics!"
-              exit 0
+            # Pull latest changes with rebase strategy
+            if git pull --rebase origin main; then
+              # If pull succeeded, try to push
+              if git push origin main; then
+                echo "✅ Successfully pushed metrics!"
+                exit 0
+              fi
+            else
+              # Rebase failed, resolve conflicts
+              echo "🔧 Resolving conflicts..."
+              
+              # Accept our version of metrics files
+              git checkout --ours assets/metrics/*.svg 2>/dev/null || true
+              git add assets/metrics/*.svg 2>/dev/null || true
+              
+              # Continue rebase
+              git rebase --continue || {
+                echo "⚠️  Rebase failed, trying alternative approach..."
+                git rebase --abort
+                
+                # Reset to origin/main and reapply our changes
+                git fetch origin main
+                git reset --soft origin/main
+                git add assets/metrics/*.svg
+                
+                if git commit -m "chore(metrics): update profile metrics [skip ci]
+
+          Updated at $(date -u '+%Y-%m-%d %H:%M:%S UTC')"; then
+                  if git push origin main; then
+                    echo "✅ Successfully pushed after reset!"
+                    exit 0
+                  fi
+                fi
+              }
             fi
 
             RETRY_COUNT=$((RETRY_COUNT + 1))
             
             if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
-              echo "⚠️  Push failed, fetching latest changes..."
-              
-              # Fetch latest
-              git fetch origin main
-              
-              # Try to rebase, accepting our changes for SVG files
-              git rebase -X ours origin/main || {
-                echo "🔧 Rebase conflict detected, resolving automatically..."
-                
-                # Accept our version of all SVG files
-                git checkout --ours assets/metrics/*.svg
-                git add assets/metrics/*.svg
-                
-                # Continue rebase
-                git rebase --continue || {
-                  echo "⚠️  Rebase still failing, aborting and using force push..."
-                  git rebase --abort
-                  
-                  # Use force-with-lease as last resort
-                  if git push --force-with-lease origin HEAD:main; then
-                    echo "✅ Force pushed successfully!"
-                    exit 0
-                  fi
-                }
-              }
-              
-              echo "⏳ Waiting 5 seconds before retry..."
-              sleep 5
+              echo "⏳ Waiting 10 seconds before retry..."
+              sleep 10
             fi
           done
 
-          echo "❌ Failed to push after $MAX_RETRIES attempts"
+          # Last resort: force push with lease
+          echo "⚠️  All retries failed, attempting force push with lease..."
+          if git push --force-with-lease origin main; then
+            echo "✅ Force pushed successfully!"
+            exit 0
+          fi
+
+          echo "❌ Failed to push after all attempts"
           exit 1
