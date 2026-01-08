@@ -60,7 +60,7 @@ jobs:
           plugin_languages_indepth: yes
           plugin_languages_analysis_timeout: 30
 
-      # ---------------- Recent activity (FIXED) ----------------
+      # ---------------- Recent activity (FIXED with proper token) ----------------
       - name: 🎯 Recent activity
         uses: lowlighter/metrics@latest
         with:
@@ -74,28 +74,11 @@ jobs:
           base: ""
           plugin_activity: yes
           plugin_activity_limit: 5
-          plugin_activity_days: 0
+          plugin_activity_load: 300
+          plugin_activity_days: 14
           plugin_activity_filter: all
           plugin_activity_visibility: all
-
-      # ---------------- Lines of code ----------------
-      - name: 📈 Lines of code changed
-        uses: lowlighter/metrics@latest
-        with:
-          token: ${{ secrets.METRICS_TOKEN }}
-          filename: metrics-lines.svg
-          template: classic
-          config_timezone: Asia/Kolkata
-          config_display: large
-          config_animations: yes
-          config_output: svg
-          base: ""
-          repositories_forks: no
-          plugin_lines: yes
-          plugin_lines_sections: repositories, history
-          plugin_lines_repositories_limit: 4
-          plugin_lines_history_limit: 2
-          plugin_lines_delay: 5
+          plugin_activity_timestamps: yes
 
       # ---------------- Isometric calendar (3D-style) ----------------
       - name: 📅 Isometric commit calendar (3D view)
@@ -128,23 +111,6 @@ jobs:
           plugin_achievements_display: detailed
           plugin_achievements_secrets: yes
           plugin_achievements_threshold: C
-
-      # ---------------- Notable contributions ----------------
-      - name: 💫 Notable contributions
-        uses: lowlighter/metrics@latest
-        with:
-          token: ${{ secrets.METRICS_TOKEN }}
-          filename: metrics-notable.svg
-          template: classic
-          config_timezone: Asia/Kolkata
-          config_display: large
-          config_animations: yes
-          config_output: svg
-          base: ""
-          plugin_notable: yes
-          plugin_notable_from: all
-          plugin_notable_types: commit, issue, pull_request
-          plugin_notable_repositories: yes
 
       # ---------------- Habits & Coding patterns ----------------
       - name: 💡 Coding habits
@@ -203,6 +169,8 @@ jobs:
         run: |
           mkdir -p assets/metrics
           mv -f metrics-*.svg assets/metrics/ 2>/dev/null || true
+          echo "✅ Metrics moved to assets/metrics/"
+          ls -la assets/metrics/
 
       # ---------------- Commit & push with conflict resolution ----------------
       - name: 🚀 Commit & push metrics
