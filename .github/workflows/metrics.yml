@@ -88,15 +88,24 @@ jobs:
         run: |
           mkdir -p assets/metrics
           mv -f metrics-*.svg assets/metrics/ || true
-
+      
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-
+      
           git add assets/metrics/*.svg
-          git diff --cached --quiet && exit 0
-
+          if git diff --cached --quiet; then
+            echo "✅ No changes to commit"
+            exit 0
+          fi
+      
           git commit -m "chore(metrics): update light metrics [skip ci]"
+      
+          # 🔑 Rebase onto latest main
+          git fetch origin main
+          git rebase origin/main
+      
           git push origin main
+
 
   # =====================================================
   # JOB 2 — HEAVY PLUGINS (GRAPHQL INTENSIVE)
