@@ -183,12 +183,21 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
       
+          # Stage only generated metrics
           git add assets/metrics/*.svg
       
+          # Exit if nothing changed
           if git diff --cached --quiet; then
             echo "✅ No changes to commit"
             exit 0
           fi
+      
+          # Commit
+          git commit -m "chore(metrics): update profile metrics [skip ci]"
+      
+          # Push directly (safe because of concurrency)
+          git push origin main
+
       
           git commit -m "chore(metrics): update profile metrics [skip ci]"
           git pull --rebase origin main
