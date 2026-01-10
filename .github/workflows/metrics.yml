@@ -173,13 +173,17 @@ jobs:
           plugin_habits_charts: yes
 
       # Move + commit
-      - name: 🚀 Commit heavy metrics
+      - name: 🚀 Commit metrics
         run: |
           mkdir -p assets/metrics
           mv -f metrics-*.svg assets/metrics/ || true
       
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+      
+          # 🔑 Always sync FIRST
+          git fetch origin main
+          git rebase origin/main
       
           # Stage generated metrics
           git add assets/metrics/*.svg
@@ -190,22 +194,9 @@ jobs:
             exit 0
           fi
       
-          # Commit metrics
-          git commit -m "chore(metrics): update heavy metrics [skip ci]"
-      
-          # 🔑 Clean working tree for rebase
-          git stash push --include-untracked --quiet
-      
-          # Rebase onto latest main
-          git fetch origin main
-          git rebase origin/main
-      
-          # Restore stash
-          git stash pop --quiet || true
-      
-          # Push safely
+          # Commit and push
+          git commit -m "chore(metrics): update metrics [skip ci]"
           git push origin main
-
 
           git commit -m "chore(metrics): update heavy metrics [skip ci]"
           git push origin main
