@@ -72,7 +72,7 @@ jobs:
           config_animations: yes
           config_output: svg
           base: ""
-          config_base: ""
+          base_skip: repositories, metadata
           plugin_activity: yes
           plugin_activity_limit: 5
           plugin_activity_load: 100
@@ -108,7 +108,7 @@ jobs:
           config_animations: yes
           config_output: svg
           base: ""
-          config_base: ""
+          base_skip: repositories, metadata
           plugin_achievements: yes
           plugin_achievements_display: detailed
           plugin_achievements_secrets: yes
@@ -126,7 +126,7 @@ jobs:
           config_animations: yes
           config_output: svg
           base: ""
-          config_base: ""
+          base_skip: repositories, metadata
           plugin_habits: yes
           plugin_habits_from: 50
           plugin_habits_days: 14
@@ -147,7 +147,7 @@ jobs:
           config_animations: yes
           config_output: svg
           base: ""
-          config_base: ""
+          base_skip: repositories, metadata
           plugin_stars: yes
           plugin_stars_limit: 3
 
@@ -163,7 +163,7 @@ jobs:
           config_animations: yes
           config_output: svg
           base: ""
-          config_base: ""
+          base_skip: repositories, metadata
           repositories_forks: no
           plugin_stargazers: yes
           plugin_stargazers_charts: yes
