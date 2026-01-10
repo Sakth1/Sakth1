@@ -13,18 +13,20 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  metrics:
-    name: Generate & publish profile metrics
+  # =====================================================
+  # JOB 1 — LIGHT PLUGINS (REST / LOW GRAPHQL)
+  # =====================================================
+  metrics-light:
+    name: Metrics (light plugins)
     runs-on: ubuntu-latest
 
     steps:
-      # ---------------- Checkout ----------------
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # ---------------- Base profile ----------------
-      - name: 📊 Base profile summary
+      # Base profile
+      - name: 📊 Base profile
         uses: lowlighter/metrics@latest
         with:
           token: ${{ secrets.METRICS_TOKEN }}
@@ -33,21 +35,15 @@ jobs:
           config_timezone: Asia/Kolkata
           config_display: large
           config_animations: yes
-          config_output: svg
           base: header, activity, community, repositories, metadata
           base_indepth: yes
 
-      # ---------------- Languages (PUBLIC ONLY, NO FORKS) ----------------
-      - name: 📚 Most used languages
+      # Languages
+      - name: 📚 Languages
         uses: lowlighter/metrics@latest
         with:
           token: ${{ secrets.METRICS_TOKEN }}
           filename: metrics-languages.svg
-          template: classic
-          config_timezone: Asia/Kolkata
-          config_display: large
-          config_animations: yes
-          config_output: svg
           base: ""
           repositories_forks: no
           repositories_affiliations: owner
@@ -55,154 +51,118 @@ jobs:
           plugin_languages_limit: 8
           plugin_languages_details: bytes-size, percentage
           plugin_languages_threshold: 1%
-          plugin_languages_colors: github
-          plugin_languages_sections: most-used
-          plugin_languages_indepth: yes
-          plugin_languages_analysis_timeout: 30
 
-      # ---------------- Recent activity ----------------
+      # Isocalendar
+      - name: 📅 Isocalendar
+        uses: lowlighter/metrics@latest
+        with:
+          token: ${{ secrets.METRICS_TOKEN }}
+          filename: metrics-isometric.svg
+          base: ""
+          plugin_isocalendar: yes
+          plugin_isocalendar_duration: full-year
+
+      # Stars
+      - name: ⭐ Stars
+        uses: lowlighter/metrics@latest
+        with:
+          token: ${{ secrets.METRICS_TOKEN }}
+          filename: metrics-stars.svg
+          base: ""
+          plugin_stars: yes
+          plugin_stars_limit: 5
+
+      # Stargazers
+      - name: 🌟 Stargazers
+        uses: lowlighter/metrics@latest
+        with:
+          token: ${{ secrets.METRICS_TOKEN }}
+          filename: metrics-stargazers.svg
+          base: ""
+          repositories_forks: no
+          plugin_stargazers: yes
+          plugin_stargazers_charts: yes
+
+      # Move + commit
+      - name: 🚀 Commit light metrics
+        run: |
+          mkdir -p assets/metrics
+          mv -f metrics-*.svg assets/metrics/ || true
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add assets/metrics/*.svg
+          git diff --cached --quiet && exit 0
+
+          git commit -m "chore(metrics): update light metrics [skip ci]"
+          git push origin main
+
+  # =====================================================
+  # JOB 2 — HEAVY PLUGINS (GRAPHQL INTENSIVE)
+  # =====================================================
+  metrics-heavy:
+    name: Metrics (heavy plugins)
+    runs-on: ubuntu-latest
+    needs: metrics-light
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Recent activity
       - name: 🎯 Recent activity
         uses: lowlighter/metrics@latest
         with:
           token: ${{ secrets.METRICS_TOKEN }}
           filename: metrics-activity.svg
-          template: classic
-          config_timezone: Asia/Kolkata
-          config_display: large
-          config_animations: yes
-          config_output: svg
           base: ""
+          plugins_errors_fatal: false
           plugin_activity: yes
           plugin_activity_limit: 5
-          plugin_activity_load: 100
-          plugin_activity_days: 14
-          plugin_activity_filter: all
-          plugin_activity_visibility: all
+          plugin_activity_load: 50
+          plugin_activity_days: 7
           plugin_activity_timestamps: yes
 
-      # ---------------- Isometric calendar (3D-style) ----------------
-      - name: 📅 Isometric commit calendar (3D view)
-        uses: lowlighter/metrics@latest
-        with:
-          token: ${{ secrets.METRICS_TOKEN }}
-          filename: metrics-isometric.svg
-          template: classic
-          config_timezone: Asia/Kolkata
-          config_display: large
-          config_animations: yes
-          config_output: svg
-          base: ""
-          plugin_isocalendar: yes
-          plugin_isocalendar_duration: full-year
-
-      # ---------------- Achievements ----------------
+      # Achievements
       - name: 🏆 Achievements
         uses: lowlighter/metrics@latest
         with:
           token: ${{ secrets.METRICS_TOKEN }}
           filename: metrics-achievements.svg
-          template: classic
-          config_timezone: Asia/Kolkata
-          config_display: large
-          config_animations: yes
-          config_output: svg
           base: ""
+          plugins_errors_fatal: false
           plugin_achievements: yes
           plugin_achievements_display: detailed
           plugin_achievements_secrets: yes
           plugin_achievements_threshold: C
 
-      # ---------------- Habits & Coding patterns ----------------
+      # Coding habits
       - name: 💡 Coding habits
         uses: lowlighter/metrics@latest
         with:
           token: ${{ secrets.METRICS_TOKEN }}
           filename: metrics-habits.svg
-          template: classic
-          config_timezone: Asia/Kolkata
-          config_display: large
-          config_animations: yes
-          config_output: svg
           base: ""
+          plugins_errors_fatal: false
           plugin_habits: yes
-          plugin_habits_from: 50
-          plugin_habits_days: 14
+          plugin_habits_from: 30
+          plugin_habits_days: 7
           plugin_habits_facts: yes
           plugin_habits_charts: yes
-          plugin_habits_charts_type: classic
-          plugin_habits_trim: yes
 
-      # ---------------- Stars ----------------
-      - name: ⭐ Recently starred
-        uses: lowlighter/metrics@latest
-        with:
-          token: ${{ secrets.METRICS_TOKEN }}
-          filename: metrics-stars.svg
-          template: classic
-          config_timezone: Asia/Kolkata
-          config_display: large
-          config_animations: yes
-          config_output: svg
-          base: ""
-          base_skip: repositories, metadata
-          plugin_stars: yes
-          plugin_stars_limit: 3
-
-      # ---------------- Stargazers ----------------
-      - name: 🌟 Stargazers chart
-        uses: lowlighter/metrics@latest
-        with:
-          token: ${{ secrets.METRICS_TOKEN }}
-          filename: metrics-stargazers.svg
-          template: classic
-          config_timezone: Asia/Kolkata
-          config_display: large
-          config_animations: yes
-          config_output: svg
-          base: ""
-          repositories_forks: no
-          plugin_stargazers: yes
-          plugin_stargazers_charts: yes
-          plugin_stargazers_charts_type: classic
-
-      # ---------------- Organize assets ----------------
-      - name: 📦 Move metrics to assets
+      # Move + commit
+      - name: 🚀 Commit heavy metrics
         run: |
           mkdir -p assets/metrics
-          mv -f metrics-*.svg assets/metrics/ 2>/dev/null || true
-          echo "✅ Metrics moved to assets/metrics/"
-          ls -la assets/metrics/
+          mv -f metrics-*.svg assets/metrics/ || true
 
-      # ---------------- THE FIX: Commit & push ----------------
-      - name: 🚀 Commit & push metrics
-        run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-      
-          # Stage only generated metrics
+
           git add assets/metrics/*.svg
-      
-          # Exit if nothing changed
-          if git diff --cached --quiet; then
-            echo "✅ No changes to commit"
-            exit 0
-          fi
-      
-          # Commit metrics
-          git commit -m "chore(metrics): update profile metrics [skip ci]"
-      
-          # Stash ANY leftover workspace changes (metrics caches, temp files)
-          git stash push --include-untracked --quiet
-      
-          # Rebase safely
-          git fetch origin main
-          git rebase origin/main
-      
-          # Restore stash (usually empty, but safe)
-          git stash pop --quiet || true
-      
-          # Push
+          git diff --cached --quiet && exit 0
+
+          git commit -m "chore(metrics): update heavy metrics [skip ci]"
           git push origin main
-
-          git push
-
