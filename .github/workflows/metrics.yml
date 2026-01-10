@@ -72,9 +72,10 @@ jobs:
           config_animations: yes
           config_output: svg
           base: ""
+          config_base: ""
           plugin_activity: yes
           plugin_activity_limit: 5
-          plugin_activity_load: 300
+          plugin_activity_load: 100
           plugin_activity_days: 14
           plugin_activity_filter: all
           plugin_activity_visibility: all
@@ -107,6 +108,7 @@ jobs:
           config_animations: yes
           config_output: svg
           base: ""
+          config_base: ""
           plugin_achievements: yes
           plugin_achievements_display: detailed
           plugin_achievements_secrets: yes
@@ -124,8 +126,9 @@ jobs:
           config_animations: yes
           config_output: svg
           base: ""
+          config_base: ""
           plugin_habits: yes
-          plugin_habits_from: 200
+          plugin_habits_from: 50
           plugin_habits_days: 14
           plugin_habits_facts: yes
           plugin_habits_charts: yes
@@ -144,6 +147,7 @@ jobs:
           config_animations: yes
           config_output: svg
           base: ""
+          config_base: ""
           plugin_stars: yes
           plugin_stars_limit: 3
 
@@ -159,6 +163,7 @@ jobs:
           config_animations: yes
           config_output: svg
           base: ""
+          config_base: ""
           repositories_forks: no
           plugin_stargazers: yes
           plugin_stargazers_charts: yes
@@ -177,68 +182,15 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          # CRITICAL FIX: Reset and clean everything first
-          git reset --hard HEAD
-          git clean -fd
-          
-          # Fetch latest from remote
-          git fetch origin main
-          
-          # Reset to remote main (clean slate)
-          git reset --hard origin/main
-          
-          # Now add our metrics files
-          git add assets/metrics/*.svg 2>/dev/null || true
-
-          # Check if there are changes
+      
+          git add assets/metrics/*.svg
+      
           if git diff --cached --quiet; then
-            echo "✅ No changes to commit - metrics are up to date!"
+            echo "✅ No changes to commit"
             exit 0
           fi
+      
+          git commit -m "chore(metrics): update profile metrics [skip ci]"
+          git pull --rebase origin main
+          git push
 
-          # Show what changed
-          echo "📊 Changes detected in metrics:"
-          git diff --cached --stat
-
-          # Commit
-          git commit -m "chore(metrics): update profile metrics [skip ci]
-
-          Updated at $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
-
-          # Push with retry
-          MAX_RETRIES=5
-          RETRY_COUNT=0
-
-          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
-            echo "🔄 Push attempt $((RETRY_COUNT + 1))/$MAX_RETRIES..."
-            
-            if git push origin HEAD:main; then
-              echo "✅ Push successful!"
-              exit 0
-            fi
-            
-            RETRY_COUNT=$((RETRY_COUNT + 1))
-            
-            if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
-              echo "⏳ Waiting 8 seconds..."
-              sleep 8
-              
-              # Reset to latest remote and re-add our changes
-              git fetch origin main
-              git reset --hard origin/main
-              git add assets/metrics/*.svg
-              git commit -m "chore(metrics): update profile metrics [skip ci]
-
-          Updated at $(date -u '+%Y-%m-%d %H:%M:%S UTC')" || true
-            fi
-          done
-
-          # Final attempt with force-with-lease
-          echo "⚠️ Using force-with-lease as final attempt..."
-          git push --force-with-lease origin HEAD:main || {
-            echo "❌ All push attempts failed"
-            exit 1
-          }
-          
-          echo "✅ Successfully pushed with force-with-lease!"
