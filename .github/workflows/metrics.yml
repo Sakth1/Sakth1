@@ -92,18 +92,29 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
       
+          # Stage only generated metrics
           git add assets/metrics/*.svg
+      
+          # Exit if nothing changed
           if git diff --cached --quiet; then
             echo "✅ No changes to commit"
             exit 0
           fi
       
+          # Commit metrics
           git commit -m "chore(metrics): update light metrics [skip ci]"
       
-          # 🔑 Rebase onto latest main
+          # 🔑 Ensure clean tree for rebase
+          git stash push --include-untracked --quiet
+      
+          # Rebase safely
           git fetch origin main
           git rebase origin/main
       
+          # Restore stash (usually empty)
+          git stash pop --quiet || true
+      
+          # Push
           git push origin main
 
 
