@@ -183,7 +183,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
       
-          # Stage generated metrics
+          # Stage only generated metrics
           git add assets/metrics/*.svg
       
           # Exit if nothing changed
@@ -192,14 +192,20 @@ jobs:
             exit 0
           fi
       
-          # Commit locally
+          # Commit metrics
           git commit -m "chore(metrics): update profile metrics [skip ci]"
       
-          # Rebase onto latest main safely
+          # Stash ANY leftover workspace changes (metrics caches, temp files)
+          git stash push --include-untracked --quiet
+      
+          # Rebase safely
           git fetch origin main
           git rebase origin/main
       
-          # Push after rebase
+          # Restore stash (usually empty, but safe)
+          git stash pop --quiet || true
+      
+          # Push
           git push origin main
 
           git push
