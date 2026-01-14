@@ -27,7 +27,7 @@ jobs:
 
       # Base profile
       - name: 📊 Base profile
-        uses: lowlighter/metrics@latest
+        uses: lowlighter/metrics@master
         with:
           token: ${{ secrets.METRICS_TOKEN }}
           filename: metrics-base.svg
@@ -40,7 +40,7 @@ jobs:
 
       # Languages
       - name: 📚 Languages
-        uses: lowlighter/metrics@latest
+        uses: lowlighter/metrics@master
         with:
           token: ${{ secrets.METRICS_TOKEN }}
           filename: metrics-languages.svg
@@ -54,7 +54,7 @@ jobs:
 
       # Isocalendar
       - name: 📅 Isocalendar
-        uses: lowlighter/metrics@latest
+        uses: lowlighter/metrics@master
         with:
           token: ${{ secrets.METRICS_TOKEN }}
           filename: metrics-isometric.svg
@@ -64,7 +64,7 @@ jobs:
 
       # Stars
       - name: ⭐ Stars
-        uses: lowlighter/metrics@latest
+        uses: lowlighter/metrics@master
         with:
           token: ${{ secrets.METRICS_TOKEN }}
           filename: metrics-stars.svg
@@ -74,7 +74,7 @@ jobs:
 
       # Stargazers
       - name: 🌟 Stargazers
-        uses: lowlighter/metrics@latest
+        uses: lowlighter/metrics@master
         with:
           token: ${{ secrets.METRICS_TOKEN }}
           filename: metrics-stargazers.svg
@@ -127,7 +127,7 @@ jobs:
 
       # Recent activity
       - name: 🎯 Recent activity
-        uses: lowlighter/metrics@latest
+        uses: lowlighter/metrics@master
         with:
           token: ${{ secrets.METRICS_TOKEN }}
           filename: metrics-activity.svg
@@ -141,7 +141,7 @@ jobs:
 
       # Achievements
       - name: 🏆 Achievements
-        uses: lowlighter/metrics@latest
+        uses: lowlighter/metrics@master
         with:
           token: ${{ secrets.METRICS_TOKEN }}
           filename: metrics-achievements.svg
@@ -154,7 +154,7 @@ jobs:
 
       # Coding habits
       - name: 💡 Coding habits
-        uses: lowlighter/metrics@latest
+        uses: lowlighter/metrics@master
         with:
           token: ${{ secrets.METRICS_TOKEN }}
           filename: metrics-habits.svg
