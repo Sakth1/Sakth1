@@ -175,10 +175,12 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           
-          # 1. Fetch latest history (which now includes changes from metrics-light)
+          # 1. Fetch latest history
           git fetch origin main
           
-          # 2. Reset index to origin/main, BUT keep working directory (generated files)
+          # 2. ⚠️ USE RESET, NOT REBASE ⚠️
+          # 'reset' allows unstaged changes to float on top of new history.
+          # 'rebase' crashes if you have unstaged changes.
           git reset origin/main
           
           # 3. Stage the files
