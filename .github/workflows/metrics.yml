@@ -175,23 +175,16 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           
-          # 1. Fetch latest history
           git fetch origin main
           
-          # 2. ⚠️ USE RESET, NOT REBASE ⚠️
-          # 'reset' allows unstaged changes to float on top of new history.
-          # 'rebase' crashes if you have unstaged changes.
           git reset origin/main
           
-          # 3. Stage the files
           git add assets/metrics/*.svg
           
-          # 4. Check for changes
           if git diff --cached --quiet; then
             echo "✅ No changes to commit"
             exit 0
           fi
           
-          # 5. Commit and push
           git commit -m "chore(metrics): update heavy metrics [skip ci]"
           git push origin main
