@@ -92,6 +92,10 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
       
+          # Sync with remote BEFORE making changes
+          git fetch origin main
+          git rebase origin/main
+      
           # Stage only generated metrics
           git add assets/metrics/*.svg
       
@@ -101,20 +105,8 @@ jobs:
             exit 0
           fi
       
-          # Commit metrics
+          # Commit and push
           git commit -m "chore(metrics): update light metrics [skip ci]"
-      
-          # 🔑 Ensure clean tree for rebase
-          git stash push --include-untracked --quiet
-      
-          # Rebase safely
-          git fetch origin main
-          git rebase origin/main
-      
-          # Restore stash (usually empty)
-          git stash pop --quiet || true
-      
-          # Push
           git push origin main
 
 
@@ -173,7 +165,7 @@ jobs:
           plugin_habits_charts: yes
 
       # Move + commit
-      - name: 🚀 Commit metrics
+      - name: 🚀 Commit heavy metrics
         run: |
           mkdir -p assets/metrics
           mv -f metrics-*.svg assets/metrics/ || true
@@ -181,7 +173,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
       
-          # 🔑 Always sync FIRST
+          # Sync with remote BEFORE making changes
           git fetch origin main
           git rebase origin/main
       
@@ -195,8 +187,5 @@ jobs:
           fi
       
           # Commit and push
-          git commit -m "chore(metrics): update metrics [skip ci]"
-          git push origin main
-
           git commit -m "chore(metrics): update heavy metrics [skip ci]"
           git push origin main
