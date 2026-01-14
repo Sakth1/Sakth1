@@ -14,18 +14,30 @@ concurrency:
 
 jobs:
   # =====================================================
-  # JOB 1 — LIGHT PLUGINS (REST / LOW GRAPHQL)
+  # JOB 1 — LIGHT PLUGINS
   # =====================================================
   metrics-light:
     name: Metrics (light plugins)
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
+      # -------------------------------------------------
+      # Ensure clean base BEFORE generating files
+      # -------------------------------------------------
+      - name: 🧹 Prepare clean working tree
+        run: |
+          git fetch origin main
+          git reset --hard origin/main
+          git clean -fd
+
+      # -------------------------------------------------
       # Base profile
+      # -------------------------------------------------
       - name: 📊 Base profile
         uses: lowlighter/metrics@latest
         with:
@@ -38,7 +50,9 @@ jobs:
           base: header, activity, community, repositories, metadata
           base_indepth: yes
 
+      # -------------------------------------------------
       # Languages
+      # -------------------------------------------------
       - name: 📚 Languages
         uses: lowlighter/metrics@latest
         with:
@@ -52,7 +66,9 @@ jobs:
           plugin_languages_details: bytes-size, percentage
           plugin_languages_threshold: 1%
 
+      # -------------------------------------------------
       # Isocalendar
+      # -------------------------------------------------
       - name: 📅 Isocalendar
         uses: lowlighter/metrics@latest
         with:
@@ -62,7 +78,9 @@ jobs:
           plugin_isocalendar: yes
           plugin_isocalendar_duration: full-year
 
+      # -------------------------------------------------
       # Stars
+      # -------------------------------------------------
       - name: ⭐ Stars
         uses: lowlighter/metrics@latest
         with:
@@ -72,7 +90,9 @@ jobs:
           plugin_stars: yes
           plugin_stars_limit: 5
 
+      # -------------------------------------------------
       # Stargazers
+      # -------------------------------------------------
       - name: 🌟 Stargazers
         uses: lowlighter/metrics@latest
         with:
@@ -83,37 +103,30 @@ jobs:
           plugin_stargazers: yes
           plugin_stargazers_charts: yes
 
-      # Move + commit
+      # -------------------------------------------------
+      # Commit light metrics
+      # -------------------------------------------------
       - name: 🚀 Commit light metrics
         run: |
           mkdir -p assets/metrics
           mv -f metrics-*.svg assets/metrics/ || true
-      
+
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-      
-          # Fetch latest changes first
-          git fetch origin main
-      
-          # Reset to origin/main (clean slate)
-          git reset --hard origin/main
-      
-          # Stage only generated metrics
+
           git add assets/metrics/*.svg
-      
-          # Exit if nothing changed
+
           if git diff --cached --quiet; then
             echo "✅ No changes to commit"
             exit 0
           fi
-      
-          # Commit and push
+
           git commit -m "chore(metrics): update light metrics [skip ci]"
           git push origin main
 
 
   # =====================================================
-  # JOB 2 — HEAVY PLUGINS (GRAPHQL INTENSIVE)
+  # JOB 2 — HEAVY PLUGINS
   # =====================================================
   metrics-heavy:
     name: Metrics (heavy plugins)
@@ -121,11 +134,23 @@ jobs:
     needs: metrics-light
 
     steps:
-      - uses: actions/checkout@v4
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
+      # -------------------------------------------------
+      # Ensure clean base BEFORE generating files
+      # -------------------------------------------------
+      - name: 🧹 Prepare clean working tree
+        run: |
+          git fetch origin main
+          git reset --hard origin/main
+          git clean -fd
+
+      # -------------------------------------------------
       # Recent activity
+      # -------------------------------------------------
       - name: 🎯 Recent activity
         uses: lowlighter/metrics@latest
         with:
@@ -139,7 +164,9 @@ jobs:
           plugin_activity_days: 7
           plugin_activity_timestamps: yes
 
+      # -------------------------------------------------
       # Achievements
+      # -------------------------------------------------
       - name: 🏆 Achievements
         uses: lowlighter/metrics@latest
         with:
@@ -152,7 +179,9 @@ jobs:
           plugin_achievements_secrets: yes
           plugin_achievements_threshold: C
 
+      # -------------------------------------------------
       # Coding habits
+      # -------------------------------------------------
       - name: 💡 Coding habits
         uses: lowlighter/metrics@latest
         with:
@@ -166,28 +195,23 @@ jobs:
           plugin_habits_facts: yes
           plugin_habits_charts: yes
 
-      # Move + commit
+      # -------------------------------------------------
+      # Commit heavy metrics
+      # -------------------------------------------------
       - name: 🚀 Commit heavy metrics
         run: |
           mkdir -p assets/metrics
           mv -f metrics-*.svg assets/metrics/ || true
-      
+
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-      
-          # Fetch and reset to latest
-          git fetch origin main
-          git reset --hard origin/main
-      
-          # Stage generated metrics
+
           git add assets/metrics/*.svg
-      
-          # Exit if nothing changed
+
           if git diff --cached --quiet; then
             echo "✅ No changes to commit"
             exit 0
           fi
-      
-          # Commit and push
+
           git commit -m "chore(metrics): update heavy metrics [skip ci]"
           git push origin main
