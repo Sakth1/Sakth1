@@ -92,9 +92,11 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
       
-          # Sync with remote BEFORE making changes
+          # Fetch latest changes first
           git fetch origin main
-          git rebase origin/main
+      
+          # Reset to origin/main (clean slate)
+          git reset --hard origin/main
       
           # Stage only generated metrics
           git add assets/metrics/*.svg
@@ -173,9 +175,9 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
       
-          # Sync with remote BEFORE making changes
+          # Fetch and reset to latest
           git fetch origin main
-          git rebase origin/main
+          git reset --hard origin/main
       
           # Stage generated metrics
           git add assets/metrics/*.svg
