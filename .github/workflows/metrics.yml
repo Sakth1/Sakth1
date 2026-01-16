@@ -109,6 +109,9 @@ jobs:
           # Commit
           git commit -m "chore(metrics): update light metrics [skip ci]"
           
+          # Clean up any other unstaged changes
+          git stash --include-untracked || true
+          
           # Push with retry logic
           max_attempts=5
           attempt=1
@@ -220,6 +223,9 @@ jobs:
           
           # Commit
           git commit -m "chore(metrics): update heavy metrics [skip ci]"
+          
+          # Clean up any other unstaged changes
+          git stash --include-untracked || true
           
           # Push with retry logic
           max_attempts=5
