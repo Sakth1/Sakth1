@@ -155,49 +155,43 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           ref: main  # Ensure we're on latest main
 
-      # Recent activity (FIXED - filter all events)
+      # Recent activity
       - name: 🎯 Recent activity
         uses: lowlighter/metrics@master
         with:
           token: ${{ secrets.METRICS_TOKEN }}
           filename: metrics-activity.svg
           base: ""
-          plugins_errors_fatal: false
           plugin_activity: yes
           plugin_activity_limit: 5
-          plugin_activity_load: 300
-          plugin_activity_days: 14
-          plugin_activity_filter: all
-          plugin_activity_visibility: all
+          plugin_activity_days: 0
+          plugin_activity_filter: issue, pr, release, fork, review, ref/create
 
-      # Achievements (FIXED - removed projects query)
+      # Achievements
       - name: 🏆 Achievements
         uses: lowlighter/metrics@master
         with:
           token: ${{ secrets.METRICS_TOKEN }}
           filename: metrics-achievements.svg
           base: ""
-          plugins_errors_fatal: false
           plugin_achievements: yes
+          plugin_achievements_only: >-
+            polyglot, stargazer, sponsor, deployer, member, maintainer, developer,
+            scripter, packager, explorer, infographile, manager
           plugin_achievements_display: compact
-          plugin_achievements_threshold: B
-          plugin_achievements_ignored: >-
-            octonaut, automator
+          plugin_achievements_threshold: X
 
-      # Coding habits (FIXED - increased events)
+      # Coding habits
       - name: 💡 Coding habits
         uses: lowlighter/metrics@master
         with:
           token: ${{ secrets.METRICS_TOKEN }}
           filename: metrics-habits.svg
           base: ""
-          plugins_errors_fatal: false
           plugin_habits: yes
-          plugin_habits_from: 200
-          plugin_habits_days: 14
           plugin_habits_facts: yes
-          plugin_habits_charts: yes
-          plugin_habits_trim: yes
+          plugin_habits_charts: no
+          config_timezone: Asia/Kolkata
 
       # Move + commit
       - name: 🚀 Commit heavy metrics
