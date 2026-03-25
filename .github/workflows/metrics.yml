@@ -3,7 +3,7 @@ name: GitHub Metrics
 on:
   workflow_dispatch:
   schedule:
-    - cron: "30 0 * * *" # 06:00 IST
+    - cron: "30 0 * * *"   # 06:00 IST daily
 
 permissions:
   contents: write
@@ -12,23 +12,31 @@ concurrency:
   group: metrics-update
   cancel-in-progress: true
 
+# =====================================================
+# SHARED COMMIT-AND-PUSH LOGIC
+# Used by both metrics jobs via a shell function.
+# =====================================================
+env:
+  COMMIT_USER: "github-actions[bot]"
+  COMMIT_EMAIL: "github-actions[bot]@users.noreply.github.com"
+
 jobs:
-  metrics:
-    name: Generate Metrics
+
+  # =====================================================
+  # JOB 1 — LIGHT PLUGINS (REST / LOW GRAPHQL)
+  # =====================================================
+  metrics-light:
+    name: Metrics (light plugins)
     runs-on: ubuntu-latest
 
     steps:
-      # =========================
-      # CHECKOUT
-      # =========================
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      # =========================
-      # BASE METRICS
-      # =========================
-      - name: Base metrics
-        uses: lowlighter/metrics@latest
+      - name: 📊 Base profile
+        uses: lowlighter/metrics@master
         with:
           token: ${{ secrets.METRICS_TOKEN }}
           filename: metrics-base.svg
@@ -39,19 +47,21 @@ jobs:
           base: header, activity, community, repositories, metadata
           base_indepth: yes
 
-      - name: Languages
-        uses: lowlighter/metrics@latest
+      - name: 📚 Languages
+        uses: lowlighter/metrics@master
         with:
           token: ${{ secrets.METRICS_TOKEN }}
           filename: metrics-languages.svg
           base: ""
+          repositories_forks: no
+          repositories_affiliations: owner
           plugin_languages: yes
           plugin_languages_limit: 8
           plugin_languages_details: bytes-size, percentage
           plugin_languages_threshold: 1%
 
-      - name: Isocalendar
-        uses: lowlighter/metrics@latest
+      - name: 📅 Isocalendar
+        uses: lowlighter/metrics@master
         with:
           token: ${{ secrets.METRICS_TOKEN }}
           filename: metrics-isometric.svg
@@ -59,8 +69,8 @@ jobs:
           plugin_isocalendar: yes
           plugin_isocalendar_duration: full-year
 
-      - name: Stars
-        uses: lowlighter/metrics@latest
+      - name: ⭐ Stars
+        uses: lowlighter/metrics@master
         with:
           token: ${{ secrets.METRICS_TOKEN }}
           filename: metrics-stars.svg
@@ -68,20 +78,60 @@ jobs:
           plugin_stars: yes
           plugin_stars_limit: 5
 
-      - name: Stargazers
-        uses: lowlighter/metrics@latest
+      - name: 🌟 Stargazers
+        uses: lowlighter/metrics@master
         with:
           token: ${{ secrets.METRICS_TOKEN }}
           filename: metrics-stargazers.svg
           base: ""
+          repositories_forks: no
           plugin_stargazers: yes
           plugin_stargazers_charts: yes
 
-      # =========================
-      # HEAVY METRICS
-      # =========================
-      - name: Recent activity
-        uses: lowlighter/metrics@latest
+      - name: 🚀 Commit light metrics
+        run: |
+          mkdir -p assets/metrics
+          mv -f metrics-*.svg assets/metrics/ 2>/dev/null || true
+
+          git config user.name  "$COMMIT_USER"
+          git config user.email "$COMMIT_EMAIL"
+          git add assets/metrics/*.svg
+
+          if git diff --staged --quiet; then
+            echo "✅ No changes to commit"; exit 0
+          fi
+
+          git commit -m "chore(metrics): update light metrics [skip ci]"
+          git stash --include-untracked || true
+
+          for attempt in $(seq 1 5); do
+            echo "Push attempt $attempt of 5..."
+            if git pull --rebase origin main && git push origin main; then
+              echo "✅ Successfully pushed"; exit 0
+            fi
+            [ $attempt -lt 5 ] && echo "⚠️ Retrying in 5s..." && sleep 5
+          done
+
+          echo "❌ Failed after 5 attempts"; exit 1
+
+
+  # =====================================================
+  # JOB 2 — HEAVY PLUGINS (GRAPHQL INTENSIVE)
+  # =====================================================
+  metrics-heavy:
+    name: Metrics (heavy plugins)
+    runs-on: ubuntu-latest
+    needs: metrics-light
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: main
+
+      - name: 🎯 Recent activity
+        uses: lowlighter/metrics@master
         with:
           token: ${{ secrets.METRICS_TOKEN }}
           filename: metrics-activity.svg
@@ -91,17 +141,21 @@ jobs:
           plugin_activity_days: 0
           plugin_activity_filter: issue, pr, release, fork, review, ref/create
 
-      - name: Achievements
-        uses: lowlighter/metrics@latest
+      - name: 🏆 Achievements
+        uses: lowlighter/metrics@master
         with:
           token: ${{ secrets.METRICS_TOKEN }}
           filename: metrics-achievements.svg
           base: ""
           plugin_achievements: yes
+          plugin_achievements_only: >-
+            polyglot, stargazer, sponsor, deployer, member, maintainer, developer,
+            scripter, packager, explorer, infographile, manager
           plugin_achievements_display: compact
+          plugin_achievements_threshold: X
 
-      - name: Coding habits
-        uses: lowlighter/metrics@latest
+      - name: 💡 Coding habits
+        uses: lowlighter/metrics@master
         with:
           token: ${{ secrets.METRICS_TOKEN }}
           filename: metrics-habits.svg
@@ -111,38 +165,55 @@ jobs:
           plugin_habits_charts: no
           config_timezone: Asia/Kolkata
 
-      # =========================
-      # SNAKE GENERATION
-      # =========================
-      - name: Generate contribution snake
+      - name: 🚀 Commit heavy metrics
+        run: |
+          mkdir -p assets/metrics
+          mv -f metrics-*.svg assets/metrics/ 2>/dev/null || true
+
+          git config user.name  "$COMMIT_USER"
+          git config user.email "$COMMIT_EMAIL"
+          git add assets/metrics/*.svg
+
+          if git diff --staged --quiet; then
+            echo "✅ No changes to commit"; exit 0
+          fi
+
+          git commit -m "chore(metrics): update heavy metrics [skip ci]"
+          git stash --include-untracked || true
+
+          for attempt in $(seq 1 5); do
+            echo "Push attempt $attempt of 5..."
+            if git pull --rebase origin main && git push origin main; then
+              echo "✅ Successfully pushed"; exit 0
+            fi
+            [ $attempt -lt 5 ] && echo "⚠️ Retrying in 5s..." && sleep 5
+          done
+
+          echo "❌ Failed after 5 attempts"; exit 1
+
+
+  # =====================================================
+  # JOB 3 — CONTRIBUTION SNAKE
+  # Runs in parallel with light/heavy metrics.
+  # Pushes snake SVGs to the `output` branch.
+  # =====================================================
+  metrics-snake:
+    name: Contribution Snake
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🐍 Generate snake animation
         uses: Platane/snk@v3
         with:
-          github_user_name: sakth1
+          github_user_name: ${{ github.repository_owner }}
           outputs: |
             dist/github-contribution-grid-snake.svg
             dist/github-contribution-grid-snake-dark.svg?palette=github-dark
 
-      # =========================
-      # MOVE FILES + COMMIT
-      # =========================
-      - name: Commit generated assets
-        run: |
-          mkdir -p assets/metrics
-          mkdir -p output
-
-          mv -f metrics-*.svg assets/metrics/ 2>/dev/null || true
-          mv -f dist/*.svg output/ 2>/dev/null || true
-
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          git add assets/metrics/*.svg output/*.svg || true
-
-          if git diff --staged --quiet; then
-            echo "No changes to commit"
-            exit 0
-          fi
-
-          git commit -m "chore: update metrics & snake"
-          git pull --rebase origin main
-          git push origin main
+      - name: 🚀 Push snake to output branch
+        uses: crazy-max/ghaction-github-pages@v4
+        with:
+          target_branch: output
+          build_dir: dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
