@@ -43,36 +43,6 @@
 
 </div>
 
-<br>
-
-<div align="center">
-<img src="https://user-images.githubusercontent.com/74038190/212284100-561aa473-3905-4a80-b561-0d28506553ee.gif" width="1000">
-</div>
-
-<br>
-
-## 🎯 `[RECENT_ACTIVITY]`
-
-<div align="center">
-<img src="./assets/metrics/metrics-activity.svg" alt="Recent Activity" width="95%">
-</div>
-
-<br>
-
-<div align="center">
-<img src="https://user-images.githubusercontent.com/74038190/212284100-561aa473-3905-4a80-b561-0d28506553ee.gif" width="1000">
-</div>
-
-<br>
-
-## 🏆 `[ACHIEVEMENTS]`
-
-<div align="center">
-<img src="./assets/metrics/metrics-achievements.svg" alt="Achievements" width="95%">
-</div>
-
-<br>
-
 <div align="center">
 <img src="https://user-images.githubusercontent.com/74038190/212284100-561aa473-3905-4a80-b561-0d28506553ee.gif" width="1000">
 </div>
@@ -83,20 +53,6 @@
 
 <div align="center">
 <img src="./assets/metrics/metrics-isometric.svg" alt="Isometric Calendar" width="95%">
-</div>
-
-<br>
-
-<div align="center">
-<img src="https://user-images.githubusercontent.com/74038190/212284100-561aa473-3905-4a80-b561-0d28506553ee.gif" width="1000">
-</div>
-
-<br>
-
-## 💡 `[CODING_PATTERNS]`
-
-<div align="center">
-<img src="./assets/metrics/metrics-habits.svg" alt="Coding Habits" width="95%">
 </div>
 
 <br>
@@ -156,16 +112,8 @@
 ![Followers](https://img.shields.io/github/followers/sakth1?style=for-the-badge&logo=github&labelColor=000&color=FF006E)
 ![Stars](https://img.shields.io/github/stars/sakth1?style=for-the-badge&logo=github&labelColor=000&color=8B5CF6)
 
-<br><br>
-
-```console
-> Connection established...
-> Profile loaded successfully
-> Thanks for visiting! 💜
-```
-
 <br>
 
-<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=12,18,20,24&height=150&section=footer" />
+<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=12,18,20,24&height=150&section=footer&text=Thanks%20for%20visiting!%20💜&fontSize=30&fontColor=fff&animation=twinkling&fontAlignY=70&" />
 
 </div>
