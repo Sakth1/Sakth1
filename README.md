@@ -1,25 +1,22 @@
 <div align="center">
 
-<!-- Neon Header - Fixed URL encoding -->
 <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=12,18,20,24&height=200&section=header&text=Have%20a%20good%20day!&fontSize=80&fontColor=fff&animation=twinkling&fontAlignY=35&" />
 
 <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=22&duration=2000&pause=1000&color=00F5FF&center=true&vCenter=true&random=false&width=600&lines=%3E+Building+the+future...;%3E+One+commit+at+a+time+%F0%9F%9A%80;%3E+Always+learning+%F0%9F%92%BB;%3E+Code+%7C+Create+%7C+Innovate" alt="Typing SVG" />
 
 <br>
 
-<!-- Neon Divider -->
 <img src="https://user-images.githubusercontent.com/74038190/212284100-561aa473-3905-4a80-b561-0d28506553ee.gif" width="1000">
 
 <br>
 
-<!-- Improved GitHub Streak - Adaptive Theme -->
 <picture>
-  <source 
-    media="(prefers-color-scheme: dark)" 
+  <source
+    media="(prefers-color-scheme: dark)"
     srcset="https://github-readme-streak-stats-profile.vercel.app?user=sakth1&theme=tokyonight&hide_border=false&border_radius=10&ring=00F5FF&fire=FF006E&currStreakLabel=00F5FF&sideLabels=8B5CF6&background=0D1117&border=30363D&stroke=58A6FF&dates=C9D1D9"
   />
-  <source 
-    media="(prefers-color-scheme: light)" 
+  <source
+    media="(prefers-color-scheme: light)"
     srcset="https://github-readme-streak-stats-profile.vercel.app?user=sakth1&theme=default&hide_border=false&border_radius=10&ring=0969DA&fire=CF222E&currStreakLabel=0969DA&sideLabels=8250DF&background=FFFFFF&border=D0D7DE&stroke=0969DA&dates=1F2328"
   />
   <img src="https://github-readme-streak-stats-profile.vercel.app?user=sakth1&theme=tokyonight&hide_border=false&border_radius=10&ring=00F5FF&fire=FF006E&currStreakLabel=00F5FF&sideLabels=8B5CF6" alt="GitHub Streak Stats" />
@@ -27,7 +24,6 @@
 
 <br>
 
-<!-- Neon Divider -->
 <img src="https://user-images.githubusercontent.com/74038190/212284100-561aa473-3905-4a80-b561-0d28506553ee.gif" width="1000">
 
 </div>
@@ -37,7 +33,7 @@
 ## 📊 `[GITHUB_ANALYTICS]`
 
 <div align="center">
-  
+
 <table>
   <tr>
     <td><img src="./assets/metrics/metrics-base.svg" alt="Base Metrics"></td>
@@ -58,7 +54,7 @@
 ## 🎯 `[RECENT_ACTIVITY]`
 
 <div align="center">
-<img src="./assets/metrics/metrics-activity.svg" alt="Activity" width="95%">
+<img src="./assets/metrics/metrics-activity.svg" alt="Recent Activity" width="95%">
 </div>
 
 <br>
@@ -86,7 +82,7 @@
 ## 📅 `[CONTRIBUTION_MATRIX]`
 
 <div align="center">
-<img src="./assets/metrics/metrics-isometric.svg" alt="3D Calendar" width="95%">
+<img src="./assets/metrics/metrics-isometric.svg" alt="Isometric Calendar" width="95%">
 </div>
 
 <br>
@@ -139,7 +135,7 @@
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/sakth1/sakth1/output/github-contribution-grid-snake-dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/sakth1/sakth1/output/github-contribution-grid-snake.svg">
-  <img alt="Snake animation" src="https://raw.githubusercontent.com/sakth1/sakth1/output/github-contribution-grid-snake.svg">
+  <img alt="Contribution snake animation" src="https://raw.githubusercontent.com/sakth1/sakth1/output/github-contribution-grid-snake.svg">
 </picture>
 
 </div>
@@ -154,7 +150,7 @@
 
 <div align="center">
 
-### `[SYSTEM_STATUS]` 
+### `[SYSTEM_STATUS]`
 
 ![Profile Views](https://komarev.com/ghpvc/?username=sakth1&color=00F5FF&style=for-the-badge&label=PROFILE+VIEWS)
 ![Followers](https://img.shields.io/github/followers/sakth1?style=for-the-badge&logo=github&labelColor=000&color=FF006E)
@@ -170,7 +166,6 @@
 
 <br>
 
-<!-- Neon Footer -->
 <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=12,18,20,24&height=150&section=footer" />
 
 </div>
