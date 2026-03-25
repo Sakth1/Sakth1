@@ -1,7 +1,7 @@
 <div align="center">
 
 <!-- Neon Header - Fixed URL encoding -->
-<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=12,18,20,24&height=200&section=header&text=Have%20a%20good%20day!&fontSize=80&fontColor=fff&animation=twinkling&fontAlignY=35&desc=Open%20Source%20Contributor&descAlignY=55&descSize=18" />
+<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=12,18,20,24&height=200&section=header&text=Have%20a%20good%20day!&fontSize=80&fontColor=fff&animation=twinkling&fontAlignY=35&" />
 
 <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=22&duration=2000&pause=1000&color=00F5FF&center=true&vCenter=true&random=false&width=600&lines=%3E+Building+the+future...;%3E+One+commit+at+a+time+%F0%9F%9A%80;%3E+Always+learning+%F0%9F%92%BB;%3E+Code+%7C+Create+%7C+Innovate" alt="Typing SVG" />
 
