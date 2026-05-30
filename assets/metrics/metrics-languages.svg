@@ -21,8 +21,8 @@
                         <rect x="0" y="0" width="460" height="8" fill="white" rx="5"/>
                     </mask>
                     <rect mask="url(#languages-bar)" x="0" y="0" width="0" height="8" fill="#d1d5da"/>
-                    <rect mask="url(#languages-bar)" x="0" y="0" width="453.07000910918924" height="8" fill="#3572A5"/>
-                    <rect mask="url(#languages-bar)" x="453.07000910918924" y="0" width="6.92999089081076" height="8" fill="#198CE7"/>
+                    <rect mask="url(#languages-bar)" x="0" y="0" width="453.0716420698674" height="8" fill="#3572A5"/>
+                    <rect mask="url(#languages-bar)" x="453.0716420698674" y="0" width="6.928357930132636" height="8" fill="#198CE7"/>
                 </svg>
                 <div class="row fill-width">
                     <section>
